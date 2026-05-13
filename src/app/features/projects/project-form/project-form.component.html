@@ -1,0 +1,54 @@
+<div class="form-page" id="project-form-page">
+  <a routerLink="/projects" class="back-link">← Back to Projects</a>
+
+  <div class="form-container">
+    <div class="form-header">
+      <h1>{{ isEditMode ? 'Edit Project' : 'Create New Project' }}</h1>
+      <p>{{ isEditMode ? 'Update your project details' : 'Set up a new project for your team' }}</p>
+    </div>
+
+    <div class="form-error" *ngIf="error" id="project-form-error">
+      <span>⚠️</span> {{ error }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="project-form" id="project-form">
+      <div class="form-group">
+        <label for="projectName">Project Name</label>
+        <input
+          type="text"
+          id="projectName"
+          [(ngModel)]="formData.name"
+          name="name"
+          placeholder="e.g. Website Redesign"
+          required
+          [class.error]="fieldErrors['name']"
+        />
+        <span class="field-error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="projectDesc">Description</label>
+        <textarea
+          id="projectDesc"
+          [(ngModel)]="formData.description"
+          name="description"
+          placeholder="Describe the project goals and scope..."
+          rows="4"
+          required
+          [class.error]="fieldErrors['description']"
+        ></textarea>
+        <span class="field-error" *ngIf="fieldErrors['description']">{{ fieldErrors['description'] }}</span>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/projects" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-primary" [disabled]="isLoading" id="project-form-submit">
+          <span *ngIf="!isLoading">{{ isEditMode ? 'Update Project' : 'Create Project' }}</span>
+          <span *ngIf="isLoading" class="btn-loading">
+            <span class="btn-spinner"></span> {{ isEditMode ? 'Updating...' : 'Creating...' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

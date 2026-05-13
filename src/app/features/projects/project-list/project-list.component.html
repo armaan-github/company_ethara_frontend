@@ -1,0 +1,63 @@
+<div class="projects-page" id="projects-page">
+  <app-loading-spinner *ngIf="isLoading" message="Loading projects..."></app-loading-spinner>
+
+  <div *ngIf="!isLoading" class="projects-content">
+    <div class="page-header">
+      <div>
+        <h1>Projects</h1>
+        <p>Manage your team projects and tasks</p>
+      </div>
+      <a *ngIf="isAdmin" routerLink="/projects/new" class="btn-primary" id="create-project-btn">
+        <span>➕</span> New Project
+      </a>
+    </div>
+
+    <div class="error-banner" *ngIf="error" id="projects-error">
+      <span>⚠️</span> {{ error }}
+    </div>
+
+    <div class="projects-grid" *ngIf="projects.length > 0">
+      <a *ngFor="let project of projects"
+         [routerLink]="['/projects', project.id]"
+         class="project-card"
+         [id]="'project-card-' + project.id">
+        <div class="project-card-header">
+          <div class="project-icon">{{ project.name.charAt(0).toUpperCase() }}</div>
+          <div class="project-actions" *ngIf="isAdmin">
+            <a [routerLink]="['/projects', project.id, 'edit']"
+               class="action-btn edit-btn"
+               (click)="$event.stopPropagation()"
+               [id]="'edit-project-' + project.id">
+              ✏️
+            </a>
+            <button class="action-btn delete-btn"
+                    (click)="deleteProject(project.id, $event)"
+                    [id]="'delete-project-' + project.id">
+              🗑️
+            </button>
+          </div>
+        </div>
+        <h3 class="project-name">{{ project.name }}</h3>
+        <p class="project-desc">{{ project.description }}</p>
+        <div class="project-meta">
+          <span class="meta-item">
+            <span class="meta-icon">👥</span> {{ project.memberCount }} members
+          </span>
+          <span class="meta-item">
+            <span class="meta-icon">📋</span> {{ project.taskCount }} tasks
+          </span>
+        </div>
+        <div class="project-footer">
+          <span class="created-by">Created by {{ project.createdBy.name }}</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="projects.length === 0 && !error">
+      <span class="empty-icon">📁</span>
+      <h3>No Projects Yet</h3>
+      <p>{{ isAdmin ? 'Create your first project to get started!' : 'You haven\'t been added to any projects yet.' }}</p>
+      <a *ngIf="isAdmin" routerLink="/projects/new" class="btn-primary">Create Project</a>
+    </div>
+  </div>
+</div>

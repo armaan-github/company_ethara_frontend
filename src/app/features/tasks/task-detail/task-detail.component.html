@@ -1,0 +1,104 @@
+<div class="detail-page" id="task-detail-page">
+  <app-loading-spinner *ngIf="isLoading" message="Loading task..."></app-loading-spinner>
+
+  <div *ngIf="!isLoading && task" class="detail-content">
+    <a [routerLink]="['/projects', task.projectId]" class="back-link" id="back-to-project">
+      ← Back to {{ task.projectName }}
+    </a>
+
+    <div class="task-header">
+      <div class="task-header-left">
+        <h1>{{ task.title }}</h1>
+        <div class="task-badges">
+          <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+            {{ task.status | statusBadge }}
+          </span>
+          <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">
+            {{ task.priority }}
+          </span>
+          <span class="overdue-badge" *ngIf="isOverdue">🔥 Overdue</span>
+        </div>
+      </div>
+      <div class="task-actions">
+        <a [routerLink]="['/projects', task.projectId, 'tasks', task.id, 'edit']"
+           class="btn-outline" id="edit-task-btn">
+          ✏️ Edit
+        </a>
+        <button *ngIf="isAdmin" class="btn-danger" (click)="deleteTask()" id="delete-task-btn">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+
+    <div class="error-banner" *ngIf="error">⚠️ {{ error }}</div>
+
+    <!-- Status Changer -->
+    <div class="status-changer" *ngIf="canChangeStatus" id="status-changer">
+      <h3>Change Status</h3>
+      <div class="status-buttons">
+        <button (click)="updateStatus('TODO')"
+                [class.active]="task.status === 'TODO'"
+                [disabled]="statusUpdating || task.status === 'TODO'"
+                class="status-btn todo-btn">
+          📝 To Do
+        </button>
+        <button (click)="updateStatus('IN_PROGRESS')"
+                [class.active]="task.status === 'IN_PROGRESS'"
+                [disabled]="statusUpdating || task.status === 'IN_PROGRESS'"
+                class="status-btn progress-btn">
+          ⚡ In Progress
+        </button>
+        <button (click)="updateStatus('DONE')"
+                [class.active]="task.status === 'DONE'"
+                [disabled]="statusUpdating || task.status === 'DONE'"
+                class="status-btn done-btn">
+          ✅ Done
+        </button>
+      </div>
+    </div>
+
+    <!-- Task Info -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>📝 Description</h3>
+        <p class="task-description">{{ task.description || 'No description provided.' }}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>📋 Details</h3>
+        <div class="detail-rows">
+          <div class="detail-row">
+            <span class="detail-label">Project</span>
+            <a [routerLink]="['/projects', task.projectId]" class="detail-value link">{{ task.projectName }}</a>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Due Date</span>
+            <span class="detail-value" [class.overdue-text]="isOverdue">{{ task.dueDate }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Assigned To</span>
+            <span class="detail-value">{{ task.assignedTo?.name || 'Unassigned' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Created By</span>
+            <span class="detail-value">{{ task.createdBy?.name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Created</span>
+            <span class="detail-value">{{ task.createdAt }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Updated</span>
+            <span class="detail-value">{{ task.updatedAt }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error && !task" class="error-state">
+    <span>❌</span>
+    <p>{{ error }}</p>
+    <a routerLink="/dashboard" class="btn-outline">Back to Dashboard</a>
+  </div>
+</div>

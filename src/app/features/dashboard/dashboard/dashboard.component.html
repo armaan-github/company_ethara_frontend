@@ -1,0 +1,160 @@
+<div class="dashboard-page" id="dashboard-page">
+  <app-loading-spinner *ngIf="isLoading" message="Loading dashboard..."></app-loading-spinner>
+
+  <div *ngIf="!isLoading && !error" class="dashboard-content" id="dashboard-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="header-text">
+        <h1>{{ getGreeting() }}, {{ (currentUser?.name ?? 'User').split(' ')[0] }} 👋</h1>
+        <p>Here's what's happening with your tasks today.</p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="stats">
+      <div class="stat-card" id="stat-total-tasks">
+        <div class="stat-icon icon-total">📋</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalTasks }}</span>
+          <span class="stat-label">Total Tasks</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="stat-todo">
+        <div class="stat-icon icon-todo">📝</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.todoCount }}</span>
+          <span class="stat-label">To Do</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="stat-in-progress">
+        <div class="stat-icon icon-progress">⚡</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.inProgressCount }}</span>
+          <span class="stat-label">In Progress</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="stat-done">
+        <div class="stat-icon icon-done">✅</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.doneCount }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="stat-overdue" [class.alert]="stats.overdueCount > 0">
+        <div class="stat-icon icon-overdue">🔥</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.overdueCount }}</span>
+          <span class="stat-label">Overdue</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="stat-projects">
+        <div class="stat-icon icon-projects">📁</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalProjects }}</span>
+          <span class="stat-label">Projects</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Sections -->
+    <div class="task-sections">
+      <!-- Overdue Tasks -->
+      <div class="task-section" *ngIf="overdueTasks.length > 0" id="overdue-tasks-section">
+        <div class="section-header">
+          <h2>🔥 Overdue Tasks</h2>
+          <span class="section-count alert">{{ overdueTasks.length }}</span>
+        </div>
+        <div class="task-list">
+          <a *ngFor="let task of overdueTasks"
+             [routerLink]="['/tasks', task.id]"
+             class="task-card overdue"
+             [id]="'overdue-task-' + task.id">
+            <div class="task-card-header">
+              <span class="task-title">{{ task.title }}</span>
+              <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">
+                {{ task.priority }}
+              </span>
+            </div>
+            <div class="task-card-meta">
+              <span class="task-project">📁 {{ task.projectName }}</span>
+              <span class="task-due">📅 {{ task.dueDate }}</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- In Progress Tasks -->
+      <div class="task-section" id="in-progress-tasks-section">
+        <div class="section-header">
+          <h2>⚡ In Progress</h2>
+          <span class="section-count">{{ inProgressTasks.length }}</span>
+        </div>
+        <div class="task-list" *ngIf="inProgressTasks.length > 0">
+          <a *ngFor="let task of inProgressTasks"
+             [routerLink]="['/tasks', task.id]"
+             class="task-card"
+             [id]="'progress-task-' + task.id">
+            <div class="task-card-header">
+              <span class="task-title">{{ task.title }}</span>
+              <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">
+                {{ task.priority }}
+              </span>
+            </div>
+            <div class="task-card-meta">
+              <span class="task-project">📁 {{ task.projectName }}</span>
+              <span class="task-due">📅 {{ task.dueDate }}</span>
+            </div>
+          </a>
+        </div>
+        <p class="empty-message" *ngIf="inProgressTasks.length === 0">No tasks in progress.</p>
+      </div>
+
+      <!-- My Tasks (All) -->
+      <div class="task-section" id="my-tasks-section">
+        <div class="section-header">
+          <h2>📋 All My Tasks</h2>
+          <span class="section-count">{{ myTasks.length }}</span>
+        </div>
+        <div class="task-list" *ngIf="myTasks.length > 0">
+          <a *ngFor="let task of myTasks"
+             [routerLink]="['/tasks', task.id]"
+             class="task-card"
+             [id]="'my-task-' + task.id">
+            <div class="task-card-header">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-badges">
+                <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+                  {{ task.status | statusBadge }}
+                </span>
+                <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">
+                  {{ task.priority }}
+                </span>
+              </div>
+            </div>
+            <div class="task-card-meta">
+              <span class="task-project">📁 {{ task.projectName }}</span>
+              <span class="task-due">📅 {{ task.dueDate }}</span>
+            </div>
+          </a>
+        </div>
+        <div class="empty-state" *ngIf="myTasks.length === 0">
+          <span class="empty-icon">🎉</span>
+          <p>No tasks assigned to you yet!</p>
+          <a routerLink="/projects" class="btn-outline">Browse Projects</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state" id="dashboard-error">
+    <span class="error-icon">❌</span>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadDashboard()">Retry</button>
+  </div>
+</div>

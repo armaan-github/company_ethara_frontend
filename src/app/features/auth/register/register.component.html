@@ -1,0 +1,105 @@
+<div class="auth-page">
+  <div class="auth-container" id="register-container">
+    <div class="auth-header">
+      <div class="auth-logo">⚡</div>
+      <h1>Create Account</h1>
+      <p>Join Ethara and start managing tasks</p>
+    </div>
+
+    <div class="auth-error" *ngIf="errorMessage" id="register-error">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form" id="register-form">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <div class="input-wrapper">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="registerData.name"
+            name="name"
+            placeholder="Enter your full name"
+            required
+            [class.error]="fieldErrors['name']"
+          />
+        </div>
+        <span class="field-error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <span class="input-icon">📧</span>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="registerData.email"
+            name="email"
+            placeholder="Enter your email"
+            required
+            [class.error]="fieldErrors['email']"
+          />
+        </div>
+        <span class="field-error" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            [(ngModel)]="registerData.password"
+            name="password"
+            placeholder="Min 6 characters"
+            required
+            minlength="6"
+            [class.error]="fieldErrors['password']"
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()" id="toggle-password-register">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <span class="field-error" *ngIf="fieldErrors['password']">{{ fieldErrors['password'] }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            required
+            [class.error]="fieldErrors['confirmPassword']"
+          />
+        </div>
+        <span class="field-error" *ngIf="fieldErrors['confirmPassword']">{{ fieldErrors['confirmPassword'] }}</span>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading" id="register-submit-btn">
+        <span *ngIf="!isLoading">Create Account</span>
+        <span *ngIf="isLoading" class="btn-loading">
+          <span class="btn-spinner"></span> Creating...
+        </span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/login" id="goto-login">Sign in</a></p>
+    </div>
+  </div>
+
+  <div class="auth-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+  </div>
+</div>

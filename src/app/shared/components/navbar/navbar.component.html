@@ -1,0 +1,38 @@
+<nav class="navbar" id="main-navbar">
+  <div class="navbar-brand">
+    <a routerLink="/dashboard" class="logo" id="navbar-logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">Ethara</span>
+    </a>
+    <button class="menu-toggle" (click)="toggleMenu()" id="navbar-menu-toggle">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+
+  <div class="navbar-menu" [class.active]="isMenuOpen">
+    <div class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" id="nav-dashboard"
+         [routerLinkActiveOptions]="{exact: true}">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a routerLink="/projects" routerLinkActive="active" id="nav-projects">
+        <span class="nav-icon">📁</span> Projects
+      </a>
+    </div>
+
+    <div class="nav-user" *ngIf="currentUser">
+      <div class="user-avatar" id="navbar-user-avatar">
+        {{ currentUser.name.charAt(0).toUpperCase() }}
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ currentUser.name }}</span>
+        <span class="user-role" [class.admin]="isAdmin">{{ currentUser.role }}</span>
+      </div>
+      <button class="btn-logout" (click)="logout()" id="navbar-logout-btn">
+        <span>🚪</span> Logout
+      </button>
+    </div>
+  </div>
+</nav>

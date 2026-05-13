@@ -1,0 +1,7 @@
+main {
+  min-height: 100vh;
+}
+
+main.with-navbar {
+  padding-top: 70px;
+}

@@ -1,0 +1,68 @@
+<div class="form-page" id="task-form-page">
+  <a [routerLink]="['/projects', projectId]" class="back-link">← Back to Project</a>
+
+  <div class="form-container">
+    <div class="form-header">
+      <h1>{{ isEditMode ? 'Edit Task' : 'Create New Task' }}</h1>
+      <p>{{ isEditMode ? 'Update task details' : 'Add a new task to this project' }}</p>
+    </div>
+
+    <div class="form-error" *ngIf="error" id="task-form-error">
+      <span>⚠️</span> {{ error }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="task-form" id="task-form">
+      <div class="form-group">
+        <label for="taskTitle">Task Title</label>
+        <input type="text" id="taskTitle" [(ngModel)]="formData.title" name="title"
+               placeholder="e.g. Design landing page" required [class.error]="fieldErrors['title']" />
+        <span class="field-error" *ngIf="fieldErrors['title']">{{ fieldErrors['title'] }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="taskDesc">Description</label>
+        <textarea id="taskDesc" [(ngModel)]="formData.description" name="description"
+                  placeholder="Describe what needs to be done..." rows="3"
+                  [class.error]="fieldErrors['description']"></textarea>
+        <span class="field-error" *ngIf="fieldErrors['description']">{{ fieldErrors['description'] }}</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="taskPriority">Priority</label>
+          <select id="taskPriority" [(ngModel)]="formData.priority" name="priority" required>
+            <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="taskDueDate">Due Date</label>
+          <input type="date" id="taskDueDate" [(ngModel)]="formData.dueDate" name="dueDate"
+                 required [class.error]="fieldErrors['dueDate']" />
+          <span class="field-error" *ngIf="fieldErrors['dueDate']">{{ fieldErrors['dueDate'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="taskAssignee">Assign To</label>
+        <select id="taskAssignee" [(ngModel)]="formData.assignedToId" name="assignedToId" required>
+          <option [ngValue]="0" disabled>Select a team member...</option>
+          <option *ngFor="let member of members" [ngValue]="member.id">
+            {{ member.name }} ({{ member.email }})
+          </option>
+        </select>
+        <span class="field-error" *ngIf="fieldErrors['assignedToId']">{{ fieldErrors['assignedToId'] }}</span>
+      </div>
+
+      <div class="form-actions">
+        <a [routerLink]="['/projects', projectId]" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-primary" [disabled]="isLoading" id="task-form-submit">
+          <span *ngIf="!isLoading">{{ isEditMode ? 'Update Task' : 'Create Task' }}</span>
+          <span *ngIf="isLoading" class="btn-loading">
+            <span class="btn-spinner"></span> {{ isEditMode ? 'Updating...' : 'Creating...' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,165 @@
+<div class="detail-page" id="project-detail-page">
+  <app-loading-spinner *ngIf="isLoading" message="Loading project..."></app-loading-spinner>
+
+  <div *ngIf="!isLoading && project" class="detail-content">
+    <!-- Back + Header -->
+    <a routerLink="/projects" class="back-link" id="back-to-projects">← Back to Projects</a>
+
+    <div class="project-header">
+      <div class="project-header-info">
+        <div class="project-avatar">{{ project.name.charAt(0).toUpperCase() }}</div>
+        <div>
+          <h1>{{ project.name }}</h1>
+          <p>{{ project.description }}</p>
+        </div>
+      </div>
+      <div class="header-actions" *ngIf="isAdmin">
+        <a [routerLink]="['/projects', project.id, 'edit']" class="btn-outline" id="edit-project-btn">✏️ Edit</a>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs-item"><span class="qs-value">{{ tasks.length }}</span><span class="qs-label">Tasks</span></div>
+      <div class="qs-item"><span class="qs-value">{{ members.length }}</span><span class="qs-label">Members</span></div>
+      <div class="qs-item"><span class="qs-value">{{ doneTasks.length }}</span><span class="qs-label">Done</span></div>
+    </div>
+
+    <div class="error-banner" *ngIf="error">⚠️ {{ error }}</div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'" id="tab-tasks">
+        📋 Tasks ({{ tasks.length }})
+      </button>
+      <button [class.active]="activeTab === 'members'" (click)="activeTab = 'members'" id="tab-members">
+        👥 Members ({{ members.length }})
+      </button>
+    </div>
+
+    <!-- Tasks Tab -->
+    <div *ngIf="activeTab === 'tasks'" class="tab-content">
+      <div class="tab-header">
+        <h2>Task Board</h2>
+        <a [routerLink]="['/projects', project.id, 'tasks', 'new']" class="btn-primary btn-sm" id="create-task-btn">
+          ➕ New Task
+        </a>
+      </div>
+
+      <div class="task-board">
+        <!-- TODO Column -->
+        <div class="board-column" id="column-todo">
+          <div class="column-header todo-header">
+            <span class="column-dot dot-todo"></span> To Do
+            <span class="column-count">{{ todoTasks.length }}</span>
+          </div>
+          <div class="column-tasks">
+            <a *ngFor="let task of todoTasks"
+               [routerLink]="['/tasks', task.id]"
+               class="board-task-card"
+               [id]="'task-card-' + task.id">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-card-bottom">
+                <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">{{ task.priority }}</span>
+                <span class="task-assignee" *ngIf="task.assignedTo">{{ task.assignedTo.name.charAt(0) }}</span>
+              </div>
+            </a>
+            <p class="column-empty" *ngIf="todoTasks.length === 0">No tasks</p>
+          </div>
+        </div>
+
+        <!-- IN PROGRESS Column -->
+        <div class="board-column" id="column-in-progress">
+          <div class="column-header progress-header">
+            <span class="column-dot dot-progress"></span> In Progress
+            <span class="column-count">{{ inProgressTasks.length }}</span>
+          </div>
+          <div class="column-tasks">
+            <a *ngFor="let task of inProgressTasks"
+               [routerLink]="['/tasks', task.id]"
+               class="board-task-card"
+               [id]="'task-card-' + task.id">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-card-bottom">
+                <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">{{ task.priority }}</span>
+                <span class="task-assignee" *ngIf="task.assignedTo">{{ task.assignedTo.name.charAt(0) }}</span>
+              </div>
+            </a>
+            <p class="column-empty" *ngIf="inProgressTasks.length === 0">No tasks</p>
+          </div>
+        </div>
+
+        <!-- DONE Column -->
+        <div class="board-column" id="column-done">
+          <div class="column-header done-header">
+            <span class="column-dot dot-done"></span> Done
+            <span class="column-count">{{ doneTasks.length }}</span>
+          </div>
+          <div class="column-tasks">
+            <a *ngFor="let task of doneTasks"
+               [routerLink]="['/tasks', task.id]"
+               class="board-task-card done-card"
+               [id]="'task-card-' + task.id">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-card-bottom">
+                <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">{{ task.priority }}</span>
+                <span class="task-assignee" *ngIf="task.assignedTo">{{ task.assignedTo.name.charAt(0) }}</span>
+              </div>
+            </a>
+            <p class="column-empty" *ngIf="doneTasks.length === 0">No tasks</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Members Tab -->
+    <div *ngIf="activeTab === 'members'" class="tab-content">
+      <div class="tab-header">
+        <h2>Team Members</h2>
+        <button *ngIf="isAdmin" class="btn-primary btn-sm" (click)="showAddMember = !showAddMember" id="add-member-toggle">
+          {{ showAddMember ? '✕ Cancel' : '➕ Add Member' }}
+        </button>
+      </div>
+
+      <!-- Add Member Form -->
+      <div class="add-member-form" *ngIf="showAddMember && isAdmin" id="add-member-form">
+        <select [(ngModel)]="selectedUserId" class="member-select" id="member-select">
+          <option [ngValue]="null" disabled>Select a user...</option>
+          <option *ngFor="let user of availableUsers" [ngValue]="user.id">
+            {{ user.name }} ({{ user.email }})
+          </option>
+        </select>
+        <button class="btn-primary btn-sm" (click)="addMember()" [disabled]="!selectedUserId" id="add-member-btn">
+          Add
+        </button>
+      </div>
+
+      <div class="members-list">
+        <div *ngFor="let member of members" class="member-card" [id]="'member-' + member.id">
+          <div class="member-avatar">{{ member.name.charAt(0).toUpperCase() }}</div>
+          <div class="member-info">
+            <span class="member-name">{{ member.name }}</span>
+            <span class="member-email">{{ member.email }}</span>
+          </div>
+          <span class="member-role" [class.admin]="member.role === 'ADMIN'">{{ member.role }}</span>
+          <button *ngIf="isAdmin && member.role !== 'ADMIN'"
+                  class="btn-remove"
+                  (click)="removeMember(member.id)"
+                  [id]="'remove-member-' + member.id">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="members.length === 0">
+        <p>No members in this project yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error && !project" class="error-state">
+    <span>❌</span>
+    <p>{{ error }}</p>
+    <a routerLink="/projects" class="btn-outline">Back to Projects</a>
+  </div>
+</div>
